@@ -56,6 +56,8 @@ public class MinifyWebsite extends HttpServlet
 				}
 
 			}
+			replaceImages(htmlDoc);
+			response.getWriter().write(htmlDoc.toString());
 		} catch (IOException e)
 		{
 			// TODO Auto-generated catch block
@@ -104,7 +106,8 @@ public class MinifyWebsite extends HttpServlet
 	private void compressJPEGImage(BufferedImage image) throws IOException
 	{
 
-		File compressedImage = new File(COMPRESSED_IMAGES_PATH + "image" + imgNumber + ".jpg");
+		File compressedImage = new File(COMPRESSED_IMAGES_PATH + "image"
+				+ imgNumber + ".jpg");
 
 		OutputStream outputStream = new FileOutputStream(compressedImage);
 		float quality = 0.7f;
@@ -131,6 +134,22 @@ public class MinifyWebsite extends HttpServlet
 		writer.dispose();
 		imgNumber++;
 
+	}
+
+	private void replaceImages(Document doc)
+	{
+		String path = "/minify/compressedImages/";
+
+		int imgNumber = 0;
+		for (Element image : doc.getElementsByTag("img"))
+		{
+			if (image.attr("src").contains("jpg")
+					|| image.attr("src").contains("jpeg"))
+			{
+				image.attr("src", path + "image" + imgNumber + ".jpg");
+				imgNumber++;
+			}
+		}
 	}
 
 }
