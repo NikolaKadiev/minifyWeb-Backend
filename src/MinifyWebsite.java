@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -43,6 +44,7 @@ public class MinifyWebsite extends HttpServlet
 		String url = request.getParameter("url");
 		try
 		{
+			deleteExistingImages(new File(COMPRESSED_IMAGES_PATH));
 			htmlDoc = getHtmlDoc(url, userAgent);
 			imageSources = extractImageSources(url, htmlDoc);
 			Iterator<String> iter = imageSources.iterator();
@@ -150,6 +152,11 @@ public class MinifyWebsite extends HttpServlet
 				imgNumber++;
 			}
 		}
+	}
+
+	private void deleteExistingImages(File directory) throws IOException
+	{
+		FileUtils.cleanDirectory(directory);
 	}
 
 }
