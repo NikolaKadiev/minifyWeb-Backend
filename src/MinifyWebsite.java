@@ -1,10 +1,17 @@
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
+import javax.imageio.stream.ImageOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,7 +26,9 @@ public class MinifyWebsite extends HttpServlet
 {
 	private static final long serialVersionUID = 1L;
 	private Document htmlDoc;
-	ArrayList<String> imageSources;
+	private ArrayList<String> imageSources;
+	private int imgNumber = 0;
+	private static final String COMPRESSED_IMAGES_PATH = "/home/nikola/workspace/minify/WebContent/compressedImages/";
 
 	public MinifyWebsite()
 	{
@@ -40,8 +49,12 @@ public class MinifyWebsite extends HttpServlet
 			while (iter.hasNext())
 			{
 				String imageSrc = iter.next();
-				response.getWriter().write(imageSrc);
-				response.getWriter().write("<p></p>");
+				BufferedImage image = getImage(imageSrc);
+				if (image != null)
+				{
+					compressJPEGImage(image);
+				}
+
 			}
 		} catch (IOException e)
 		{
@@ -86,6 +99,38 @@ public class MinifyWebsite extends HttpServlet
 			return image;
 		}
 		return null;
+	}
+
+	private void compressJPEGImage(BufferedImage image) throws IOException
+	{
+
+		File compressedImage = new File(COMPRESSED_IMAGES_PATH + "image" + imgNumber + ".jpg");
+
+		OutputStream outputStream = new FileOutputStream(compressedImage);
+		float quality = 0.7f;
+		Iterator<ImageWriter> imgWriters = ImageIO
+				.getImageWritersByFormatName("jpg");
+		if (!imgWriters.hasNext())
+		{
+			throw new IllegalStateException("No writers found");
+
+		}
+
+		ImageWriter writer = imgWriters.next();
+		ImageOutputStream ios = ImageIO.createImageOutputStream(outputStream);
+		writer.setOutput(ios);
+
+		ImageWriteParam parametars = writer.getDefaultWriteParam();
+		parametars.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+		parametars.setCompressionQuality(quality);
+
+		writer.write(null, new IIOImage(image, null, null), parametars);
+
+		outputStream.close();
+		ios.close();
+		writer.dispose();
+		imgNumber++;
+
 	}
 
 }
