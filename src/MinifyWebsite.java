@@ -39,6 +39,7 @@ public class MinifyWebsite extends HttpServlet
 	private static final String OPTIMIZED_IMAGES_PATH = "/home/nikola/workspace/minify/WebContent/optimizedImages/";
 	static Map<String, BufferedImage> images = new HashMap<>();
 
+
 	public MinifyWebsite()
 	{
 		super();
