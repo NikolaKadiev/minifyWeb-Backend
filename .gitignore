@@ -1,1 +1,2 @@
-WebContent/compressedImages/*
+WebContent/originalImages/*
+WebContent/optimizedImages/*

@@ -298,46 +298,4 @@ public class MinifyWebsite extends HttpServlet
         }
     }
 
-    private class GetImageWorker implements Runnable
-    {
-        private String imgSource = null;
-        private BufferedImage image = null;
-
-        GetImageWorker(String imgSource)
-        {
-            this.imgSource = imgSource;
-        }
-
-        @Override
-        public void run()
-        {
-            System.out.println(Thread.currentThread().toString() + " "
-                    + imgSource);
-
-            image = getImageFromUrl(imgSource);
-            images.put(imgSource, image);
-
-        }
-
-        private BufferedImage getImageFromUrl(String imgSource)
-
-        {
-            try
-            {
-                if (imgSource.contains("jpg") || imgSource.contains("jpeg"))
-                {
-                    URL imgSrc = new URL(imgSource);
-                    BufferedImage image = ImageIO.read(imgSrc);
-                    return image;
-                }
-            } catch (IOException e)
-            {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-            return null;
-        }
-
-    }
-
 }
