@@ -58,6 +58,7 @@ public class MinifyWebsite extends HttpServlet
             deleteExistingImages(new File(ORIGINAL_IMAGES_PATH));
             deleteExistingImages(new File(OPTIMIZED_IMAGES_PATH));
             htmlDoc = getHtmlDoc(url, userAgent);
+            replaceLinks(htmlDoc);
             changeLinksToAbsoluteUrls(htmlDoc, url);
             String charset = getCharset(htmlDoc);
             response.setCharacterEncoding(charset);
@@ -294,6 +295,17 @@ public class MinifyWebsite extends HttpServlet
                 if (scriptSrc.contains("http://") == false)
                     element.attr("src", host + scriptSrc);
             }
+
+        }
+    }
+
+    private void replaceLinks(Document doc)
+    {
+        String minifyWebAddress = "http://minifyweb.ddns.net/minify/minifyWebsite?url=";
+        for (Element link : doc.getElementsByTag("a"))
+        {
+            String href = link.attr("href");
+            link.attr("href", minifyWebAddress + href );
 
         }
     }
