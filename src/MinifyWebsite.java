@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
@@ -13,7 +14,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.catalina.Host;
 import org.apache.tomcat.util.http.fileupload.FileUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -47,7 +48,6 @@ public class MinifyWebsite extends HttpServlet
     protected void doGet(HttpServletRequest request,
             HttpServletResponse response)
     {
-        // response.setCharacterEncoding("utf-8");
         ArrayList<String> JPEGImageSources = null;
         String userAgent = request.getHeader("user-agent");
         String url = request.getParameter("url");
@@ -58,11 +58,10 @@ public class MinifyWebsite extends HttpServlet
             deleteExistingImages(new File(ORIGINAL_IMAGES_PATH));
             deleteExistingImages(new File(OPTIMIZED_IMAGES_PATH));
             htmlDoc = getHtmlDoc(url, userAgent);
-            replaceLinks(htmlDoc);
-            changeLinksToAbsoluteUrls(htmlDoc, url);
             String charset = getCharset(htmlDoc);
             response.setCharacterEncoding(charset);
             JPEGImageSources = extractJPEGImagesSources(url, htmlDoc);
+
             long start = System.currentTimeMillis();
             saveOriginalJPEGImages(JPEGImageSources);
             long end = System.currentTimeMillis();
@@ -73,6 +72,9 @@ public class MinifyWebsite extends HttpServlet
 
             optimalJPEGCompress();
             replaceImages(htmlDoc);
+            replaceLinks(htmlDoc, url);
+            changeStylesheetsSourcesToAbsoluteUrls(htmlDoc, url);
+            changeScriptSourcesToAbsoluteUrls(htmlDoc, url);
             response.getWriter().write(htmlDoc.toString());
 
         } catch (IOException e)
@@ -90,9 +92,13 @@ public class MinifyWebsite extends HttpServlet
         return doc;
     }
 
-    private ArrayList<String> extractJPEGImagesSources(String host, Document doc)
+    private ArrayList<String> extractJPEGImagesSources(String url, Document doc)
+            throws MalformedURLException
     {
         ArrayList<String> imageSources = new ArrayList<>();
+        URL pageUrl = new URL(url);
+        String host = pageUrl.getHost();
+        System.out.println(host);
 
         for (Element image : htmlDoc.getElementsByTag("img"))
         {
@@ -104,7 +110,7 @@ public class MinifyWebsite extends HttpServlet
                     imageSources.add(src);
                 } else
                 {
-                    imageSources.add(host + src);
+                    imageSources.add("http://" + host + src);
                 }
             }
 
@@ -278,35 +284,51 @@ public class MinifyWebsite extends HttpServlet
         return null;
     }
 
-    private void changeLinksToAbsoluteUrls(Document doc, String host)
+
+    private void changeStylesheetsSourcesToAbsoluteUrls(Document doc, String url) throws MalformedURLException
     {
-        for (Element element : doc.getAllElements())
+        URL pageUrl = new URL(url);
+        String host = pageUrl.getHost();
+        for (Element element : doc.getElementsByTag("link"))
         {
 
             if (element.hasAttr("href"))
             {
                 String stylesheetUrl = element.attr("href");
                 if (stylesheetUrl.contains("http://") == false)
-                    element.attr("href", host + stylesheetUrl);
-            }
-            if (element.hasAttr("src"))
-            {
-                String scriptSrc = element.attr("src");
-                if (scriptSrc.contains("http://") == false)
-                    element.attr("src", host + scriptSrc);
+                    element.attr("href", "http://" + host + stylesheetUrl);
             }
 
         }
     }
+    private void changeScriptSourcesToAbsoluteUrls(Document doc, String url) throws MalformedURLException
+    {
+        URL pageUrl = new URL(url);
+        String host = pageUrl.getHost();
+        for (Element element : doc.getElementsByTag("script"))
+        {
+            if (element.hasAttr("src"))
+            {
+                String scriptSrc = element.attr("src");
+                if (scriptSrc.contains("http://") == false)
+                    element.attr("src", "http://" + host + scriptSrc);
+            }
+        }
+    }
 
-    private void replaceLinks(Document doc)
+    private void replaceLinks(Document doc, String host)
     {
         String minifyWebAddress = "http://minifyweb.ddns.net/minify/minifyWebsite?url=";
         for (Element link : doc.getElementsByTag("a"))
         {
             String href = link.attr("href");
-            link.attr("href", minifyWebAddress + href );
-
+            if (href.contains("http://"))
+            {
+                link.attr("href", minifyWebAddress + href);
+            } else
+            {
+                link.attr("href", minifyWebAddress + host + href);
+            }
         }
     }
 
