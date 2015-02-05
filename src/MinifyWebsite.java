@@ -284,8 +284,8 @@ public class MinifyWebsite extends HttpServlet
         return null;
     }
 
-
-    private void changeStylesheetsSourcesToAbsoluteUrls(Document doc, String url) throws MalformedURLException
+    private void changeStylesheetsSourcesToAbsoluteUrls(Document doc, String url)
+            throws MalformedURLException
     {
         URL pageUrl = new URL(url);
         String host = pageUrl.getHost();
@@ -301,7 +301,9 @@ public class MinifyWebsite extends HttpServlet
 
         }
     }
-    private void changeScriptSourcesToAbsoluteUrls(Document doc, String url) throws MalformedURLException
+
+    private void changeScriptSourcesToAbsoluteUrls(Document doc, String url)
+            throws MalformedURLException
     {
         URL pageUrl = new URL(url);
         String host = pageUrl.getHost();
@@ -316,18 +318,21 @@ public class MinifyWebsite extends HttpServlet
         }
     }
 
-    private void replaceLinks(Document doc, String host)
+    private void replaceLinks(Document doc, String url)
+            throws MalformedURLException
     {
         String minifyWebAddress = "http://minifyweb.ddns.net/minify/minifyWebsite?url=";
         for (Element link : doc.getElementsByTag("a"))
         {
             String href = link.attr("href");
+            URL pageUrl = new URL(url);
+            String host = pageUrl.getHost();
             if (href.contains("http://"))
             {
                 link.attr("href", minifyWebAddress + href);
             } else
             {
-                link.attr("href", minifyWebAddress + host + href);
+                link.attr("href", minifyWebAddress + "http://" + host + href);
             }
         }
     }
