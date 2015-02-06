@@ -110,6 +110,7 @@ public class MinifyWebsite extends HttpServlet
                     imageSources.add(src);
                 } else
                 {
+                    src = addLeadingSlash(src);
                     imageSources.add("http://" + host + src);
                 }
             }
@@ -118,7 +119,6 @@ public class MinifyWebsite extends HttpServlet
         return imageSources;
     }
 
-    @SuppressWarnings("deprecation")
     private void getImages(ArrayList<String> imageSources) throws IOException
     {
         Iterator<String> iter = imageSources.iterator();
@@ -332,9 +332,20 @@ public class MinifyWebsite extends HttpServlet
                 link.attr("href", minifyWebAddress + href);
             } else
             {
+                href = addLeadingSlash(href);
                 link.attr("href", minifyWebAddress + "http://" + host + href);
             }
         }
     }
 
+    private String addLeadingSlash(String href)
+    {
+        if (href.startsWith("/") == false)
+        {
+            return href = "/" + href;
+        } else
+        {
+            return href;
+        }
+    }
 }
