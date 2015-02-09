@@ -47,13 +47,10 @@ public class MinifyWebsite extends HttpServlet
     private static final String IOEXCEPTION_MESSAGE = "There was a problem while processing your request! ";
     private static final String UNKNOWN_HOST_MESAGE = "The host you entered does not exist! ";
     static Map<String, BufferedImage> images = new HashMap<>();
-    private static Logger logger = Logger.getLogger("java.net");
-
+  
     public MinifyWebsite()
     {
         super();
-        configureLogger(logger);
-
     }
 
     protected void doGet(HttpServletRequest request,
@@ -95,7 +92,7 @@ public class MinifyWebsite extends HttpServlet
         {
             try
             {
-                logger.log(Level.SEVERE, MALFORMED_URL_MESSAGE + e.getMessage());
+
                 response.getWriter().write(
                         MALFORMED_URL_MESSAGE + e.getMessage());
             } catch (IOException e1)
@@ -106,7 +103,7 @@ public class MinifyWebsite extends HttpServlet
         {
             try
             {
-                logger.log(Level.SEVERE, UNKNOWN_HOST_MESAGE + e.getMessage());
+
                 response.getWriter()
                         .write(UNKNOWN_HOST_MESAGE + e.getMessage());
             } catch (IOException e1)
@@ -117,7 +114,7 @@ public class MinifyWebsite extends HttpServlet
         {
             try
             {
-                logger.log(Level.SEVERE, IOEXCEPTION_MESSAGE + e.getMessage());
+
                 response.getWriter()
                         .write(IOEXCEPTION_MESSAGE + e.getMessage());
                 e.printStackTrace();
@@ -393,19 +390,4 @@ public class MinifyWebsite extends HttpServlet
         }
     }
 
-    private void configureLogger(Logger logger)
-    {
-        try
-        {
-            Handler handler = new FileHandler(
-                    "/home/nikola/workspace/minify/logger/minify.log");
-            logger.addHandler(handler);
-        } catch (SecurityException e)
-        {
-            e.printStackTrace();
-        } catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-    }
 }
