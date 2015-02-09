@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 
 import java.util.HashMap;
@@ -14,6 +15,10 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.FileHandler;
+import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -38,11 +43,17 @@ public class MinifyWebsite extends HttpServlet
     private Document htmlDoc;
     private static final String ORIGINAL_IMAGES_PATH = "/home/nikola/workspace/minify/WebContent/originalImages/";
     private static final String OPTIMIZED_IMAGES_PATH = "/home/nikola/workspace/minify/WebContent/optimizedImages/";
+    private static final String MALFORMED_URL_MESSAGE = "The url address you endered is malformed! ";
+    private static final String IOEXCEPTION_MESSAGE = "There was a problem while processing your request! ";
+    private static final String UNKNOWN_HOST_MESAGE = "The host you entered does not exist! ";
     static Map<String, BufferedImage> images = new HashMap<>();
+    private static Logger logger = Logger.getLogger("java.net");
 
     public MinifyWebsite()
     {
         super();
+        configureLogger(logger);
+
     }
 
     protected void doGet(HttpServletRequest request,
@@ -54,6 +65,9 @@ public class MinifyWebsite extends HttpServlet
 
         try
         {
+            @SuppressWarnings("unused")
+            // test for malformed url
+            URL enteredUrl = new URL(url);
             images.clear();
             deleteExistingImages(new File(ORIGINAL_IMAGES_PATH));
             deleteExistingImages(new File(OPTIMIZED_IMAGES_PATH));
@@ -77,10 +91,40 @@ public class MinifyWebsite extends HttpServlet
             changeScriptSourcesToAbsoluteUrls(htmlDoc, url);
             response.getWriter().write(htmlDoc.toString());
 
+        } catch (MalformedURLException e)
+        {
+            try
+            {
+                logger.log(Level.SEVERE, MALFORMED_URL_MESSAGE + e.getMessage());
+                response.getWriter().write(
+                        MALFORMED_URL_MESSAGE + e.getMessage());
+            } catch (IOException e1)
+            {
+                e1.printStackTrace();
+            }
+        } catch (UnknownHostException e)
+        {
+            try
+            {
+                logger.log(Level.SEVERE, UNKNOWN_HOST_MESAGE + e.getMessage());
+                response.getWriter()
+                        .write(UNKNOWN_HOST_MESAGE + e.getMessage());
+            } catch (IOException e1)
+            {
+                e1.printStackTrace();
+            }
         } catch (IOException e)
         {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try
+            {
+                logger.log(Level.SEVERE, IOEXCEPTION_MESSAGE + e.getMessage());
+                response.getWriter()
+                        .write(IOEXCEPTION_MESSAGE + e.getMessage());
+                e.printStackTrace();
+            } catch (IOException e1)
+            {
+                e1.printStackTrace();
+            }
         }
 
     }
@@ -346,6 +390,22 @@ public class MinifyWebsite extends HttpServlet
         } else
         {
             return href;
+        }
+    }
+
+    private void configureLogger(Logger logger)
+    {
+        try
+        {
+            Handler handler = new FileHandler(
+                    "/home/nikola/workspace/minify/logger/minify.log");
+            logger.addHandler(handler);
+        } catch (SecurityException e)
+        {
+            e.printStackTrace();
+        } catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 }

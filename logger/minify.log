@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE log SYSTEM "logger.dtd">
+<log>
+<record>
+  <date>2015-02-09T21:11:58</date>
+  <millis>1423512718125</millis>
+  <sequence>75</sequence>
+  <logger>java.net</logger>
+  <level>SEVERE</level>
+  <class>MinifyWebsite</class>
+  <method>doGet</method>
+  <thread>100</thread>
+  <message>unknown protocol: httffp</message>
+</record>
+<record>
+  <date>2015-02-09T21:12:21</date>
+  <millis>1423512741941</millis>
+  <sequence>76</sequence>
+  <logger>java.net</logger>
+  <level>SEVERE</level>
+  <class>MinifyWebsite</class>
+  <method>doGet</method>
+  <thread>98</thread>
+  <message>dasasffa</message>
+</record>
+<record>
+  <date>2015-02-09T21:16:00</date>
+  <millis>1423512960244</millis>
+  <sequence>83</sequence>
+  <logger>java.net</logger>
+  <level>SEVERE</level>
+  <class>MinifyWebsite</class>
+  <method>doGet</method>
+  <thread>103</thread>
+  <message>The host you entered does not exist! dasasffa</message>
+</record>
+<record>
+  <date>2015-02-09T21:17:14</date>
+  <millis>1423513034072</millis>
+  <sequence>84</sequence>
+  <logger>java.net</logger>
+  <level>SEVERE</level>
+  <class>MinifyWebsite</class>
+  <method>doGet</method>
+  <thread>107</thread>
+  <message>The url address you endered is malformed! unknown protocol: httpdd</message>
+</record>
+
+  <millis>1423513034072</millis>
+  <sequence>84</sequence>
+  <logger>java.net</logger>
+  <level>SEVERE</level>
+  <class>MinifyWebsite</class>
+  <method>doGet</method>
+  <thread>107</thread>
+  <message>The url address you endered is malformed! unknown protocol: httpdd</message>
+</record>
